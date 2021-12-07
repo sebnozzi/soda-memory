@@ -2,6 +2,8 @@
 
 This is a port of the [Mini Micro version](https://github.com/sebnozzi/minimicro-memorygame) to the [soda engine](https://github.com/JoeStrout/soda).
 
+<img alt="Screenshot of the game" src="./soda-memory.png" width="50%" height="50%"/>
+
 Some differences are:
 
 * Cards are pre-rendered (instead of constructed in-game)
