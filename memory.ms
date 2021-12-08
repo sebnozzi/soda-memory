@@ -62,9 +62,19 @@ boardHeight=(boxHeight+margin)*countRows-margin
 boardOriginX=960/2-(boardWidth/2)
 boardOriginY=640/2-(boardHeight/2)
 
+loadImg = function(imgName)
+  img = file.loadImage(file.child("card_images", imgName))
+  if img == null then
+    print "Image could not be loaded: ./card_images/" + imgName
+    print "Be sure to execute this program from the directory of the main script file"
+    print "(cd / move to the directory with the main script first)"
+    exit
+  end if
+  return img
+end function
 
 loadCardBackImg = function()
-  img = file.loadImage(file.child("card_images","Back_Card.png"))
+  img = loadImg("Back_Card.png")
   return img
 end function
 
@@ -101,7 +111,7 @@ end function
 
 // Create card sprites from file-names
 for fileName in foodFileNames
-  cardImg = file.loadImage(file.child("card_images", fileName))
+  cardImg = loadImg(fileName)
   // We now have the image of the card, let's create sprites
   cardSpriteA = createCardSprite("A",fileName,cardImg)
   cardSpriteB = createCardSprite("B",fileName,cardImg)
