@@ -158,12 +158,6 @@ end function
 pair.isMatched = function()
   return self.firstCard.isPairOf(self.secondCard)
 end function
-pair.hasFirstCard = function()
-  return self.firstCard != null
-end function
-pair.hasSecondCard = function()
-  return self.secondCard != null
-end function
 pair.showBack = function()
   self.firstCard.showBack
   self.secondCard.showBack
@@ -224,9 +218,9 @@ while true
   // Process clicked card, if any
   if clickedCard != null then
     clickedCard.showFront
-    if not pair.hasFirstCard then
+    if pair.firstCard == null then
       pair.firstCard = clickedCard
-    else if not pair.hasSecondCard then
+    else if pair.secondCard == null then
       pair.secondCard = clickedCard
       if pair.isMatched then
         // Match found!
