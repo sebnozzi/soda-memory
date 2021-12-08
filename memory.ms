@@ -183,7 +183,8 @@ end function
 
 while true
   isButtonDown = mouse.button  
-  
+
+  // Find clicked card
   clickedCard = null
   if isButtonDown and not wasButtonDown then
     for card in cards
@@ -193,6 +194,8 @@ while true
       end if 
     end for
   end if
+  // Prevent processing further mouse-clicks in next loop
+  wasButtonDown = isButtonDown
 
   if clickedCard != null then
     if cardA == null then
@@ -217,9 +220,7 @@ while true
       cardB = null
     end if
   end if
-  
-  wasButtonDown = isButtonDown
-  
+    
   if pairedCardsCount == len(cards) then
     // Game is won
     endTime = time
