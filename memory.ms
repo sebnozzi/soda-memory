@@ -81,8 +81,6 @@ cards = []
 
 CardSprite = new Sprite
 CardSprite.fileName = "UNDEFINED"
-CardSprite.variant = "A/B"
-CardSprite.otherPair = null
 CardSprite.backImg = loadCardBackImg
 CardSprite.showingFront = false
 CardSprite.showBack = function()
@@ -93,10 +91,12 @@ CardSprite.showFront = function()
   self.image = self.frontImg
   self.showingFront = true
 end function
+CardSprite.isPairOf = function(otherCard)
+  return self.fileName == otherCard.fileName
+end function
 
-createCardSprite = function(variant,fileName,cardImg)
+createCardSprite = function(fileName,cardImg)
   cardSprite = new CardSprite
-  cardSprite.variant = variant
   cardSprite.frontImg = cardImg
   cardSprite.fileName = fileName
   // Setting the localBounds is necessary to later being
@@ -112,10 +112,8 @@ end function
 for fileName in foodFileNames
   cardImg = loadImg(fileName)
   // We now have the image of the card, let's create sprites
-  cardSpriteA = createCardSprite("A",fileName,cardImg)
-  cardSpriteB = createCardSprite("B",fileName,cardImg)
-  cardSpriteA.otherPair = cardSpriteB
-  cardSpriteB.otherPair = cardSpriteA
+  cardSpriteA = createCardSprite(fileName,cardImg)
+  cardSpriteB = createCardSprite(fileName,cardImg)
   cards.push cardSpriteA
   cards.push cardSpriteB
 end for
@@ -203,7 +201,7 @@ while true
   if len(attemptedCards) == 2 then
     cardA = attemptedCards[0]
     cardB = attemptedCards[1]
-    if cardA.otherPair == cardB then
+    if cardA.isPairOf(cardB) then
       // Match found!
       matchedCards = [cardA, cardB]
       pairedCards = pairedCards + matchedCards
