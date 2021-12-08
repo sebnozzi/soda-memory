@@ -167,8 +167,9 @@ end function
 wasButtonDown = false
 isButtonDown = false
 
-attemptedCards = []
-pairedCards = []
+cardA = null
+cardB = null
+pairedCardsCount = 0
 
 attempts = 0
 startTime = time
@@ -183,43 +184,43 @@ end function
 while true
   isButtonDown = mouse.button  
   
+  clickedCard = null
   if isButtonDown and not wasButtonDown then
-    if len(attemptedCards) >= 2 then
-      // Bypass user clicks if already showing 2 attempted cards
-      break
-    end if
     for card in cards
-      if card.contains(mouse) and not card.showingFront then
-        attemptedCards.push card
-        card.showFront	
-      end if
+      if card.contains(mouse) and not card.showingFront then 
+        clickedCard = card
+        break
+      end if 
     end for
+  end if
+
+  if clickedCard != null then
+    if cardA == null then
+      cardA = clickedCard
+      cardA.showFront
+    else if cardB == null then
+      cardB = clickedCard
+      cardB.showFront
+      if cardB.isPairOf(cardA) then
+        // Match found!
+        pairedCardsCount = pairedCardsCount + 2
+        glowCards([cardA, cardB])
+      else
+        // No match - hide the pair after a while
+        wait(SECONDS_TO_PEEK)
+        cardA.showBack
+        cardB.showBack
+        attempts = attempts + 1
+      end if
+      // Reset attempted cards
+      cardA = null
+      cardB = null
+    end if
   end if
   
   wasButtonDown = isButtonDown
   
-  if len(attemptedCards) == 2 then
-    cardA = attemptedCards[0]
-    cardB = attemptedCards[1]
-    if cardA.isPairOf(cardB) then
-      // Match found!
-      matchedCards = [cardA, cardB]
-      pairedCards = pairedCards + matchedCards
-      attemptedCards = []
-      hideCardsTimeout = 0
-      glowCards(matchedCards)
-    else
-      // No match - hide the pair after a while
-      wait(SECONDS_TO_PEEK)
-      for s in attemptedCards
-        s.showBack
-      end for
-      attemptedCards = []
-      attempts = attempts + 1
-    end if
-  end if	
-  
-  if len(pairedCards) == len(cards) then
+  if pairedCardsCount == len(cards) then
     // Game is won
     endTime = time
     timeTaken = round(endTime-startTime,0)
