@@ -198,12 +198,11 @@ while true
   wasButtonDown = isButtonDown
 
   if clickedCard != null then
+    clickedCard.showFront
     if cardA == null then
       cardA = clickedCard
-      cardA.showFront
     else if cardB == null then
       cardB = clickedCard
-      cardB.showFront
       if cardB.isPairOf(cardA) then
         // Match found!
         pairedCardsCount = pairedCardsCount + 2
