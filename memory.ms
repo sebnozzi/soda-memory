@@ -14,8 +14,7 @@ hex2 = function(val)
   return digits[val / 16] + digits[val % 16]
 end function
 
-color = {}
-color.rgba = function(r, g, b, a)
+rgba = function(r, g, b, a)
   return "#" + hex2(r) + hex2(g) + hex2(b) + hex2(a)
 end function
 
@@ -30,16 +29,16 @@ SECONDS_TO_PEEK=1
 
 // These are the images to be used.
 foodFileNames = [
-"Apple_Card.png",
-"Bananas_Card.png",
-"Burger_Card.png",
-"Cake_Card.png",
-"Cheese_Card.png",
-"Cookie_Card.png",
-"Donut_Card.png",
-"Muffin_Card.png",
-"Pizza_Card.png",
-"Sushi_Card.png"]
+  "Apple_Card.png",
+  "Bananas_Card.png",
+  "Burger_Card.png",
+  "Cake_Card.png",
+  "Cheese_Card.png",
+  "Cookie_Card.png",
+  "Donut_Card.png",
+  "Muffin_Card.png",
+  "Pizza_Card.png",
+  "Sushi_Card.png"]
 
 // We may not forget about "Back_Card.png!"
 
@@ -147,7 +146,7 @@ end for
 glowCards = function(cardsToGlow)
   for i in range(0,1)
     for transparency in range(255,80,-40)
-      tintColor = color.rgba(255,255,255,transparency)
+      tintColor = rgba(255,255,255,transparency)
       for card in cardsToGlow
         card.tint = tintColor
       end for
@@ -155,7 +154,7 @@ glowCards = function(cardsToGlow)
       yield
     end for
     for transparency in range(80,255,40)
-      tintColor = color.rgba(255,255,255,transparency)
+      tintColor = rgba(255,255,255,transparency)
       for card in cardsToGlow
         card.tint = tintColor
       end for
