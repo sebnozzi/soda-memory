@@ -19,13 +19,36 @@ rgba = function(r, g, b, a)
 end function
 
 // ------------------------------------------------
-// Program
-
-window.backColor = "#000000"
+// Game properties
 
 // How long can you look at cards before hiding them again
 // In seconds
 SECONDS_TO_PEEK=1
+
+// ------------------------------------------------
+// Display properties
+
+window.backColor = "#000000"
+
+// The grid size should reflect the amount of images
+countRows=4
+countCols=5
+
+// Dimensions and visual properties of the cards
+boxWidth=120
+boxHeight=120
+
+// Margin between cards in the board
+margin=20
+// Dimensions and coordinates of the board
+boardWidth=(boxWidth+margin)*countCols-margin
+boardHeight=(boxHeight+margin)*countRows-margin
+// Make the board centered
+boardOriginX=window.width/2-(boardWidth/2)
+boardOriginY=window.height/2-(boardHeight/2)
+
+// ------------------------------------------------
+// Image loading
 
 // These are the images to be used.
 foodFileNames = [
@@ -39,27 +62,7 @@ foodFileNames = [
   "Muffin_Card.png",
   "Pizza_Card.png",
   "Sushi_Card.png"]
-
-// We may not forget about "Back_Card.png!"
-
-// The grid size should reflect the amount of images
-countRows=4
-countCols=5
-
-// Dimensions and visual properties of the cards
-boxWidth=120
-boxHeight=120
-boxBorder=10
-cardColor="#008BFFFF"
-
-// Margin between cards in the board
-margin=20
-// Dimensions and coordinates of the board
-boardWidth=(boxWidth+margin)*countCols-margin
-boardHeight=(boxHeight+margin)*countRows-margin
-// Make the board centered
-boardOriginX=960/2-(boardWidth/2)
-boardOriginY=640/2-(boardHeight/2)
+backCardFileName = "Back_Card.png"
 
 loadImg = function(imgName)
   img = file.loadImage(file.child("card_images", imgName))
@@ -72,24 +75,22 @@ loadImg = function(imgName)
   return img
 end function
 
-loadCardBackImg = function()
-  img = loadImg("Back_Card.png")
-  return img
-end function
-
-cards = []
+// ------------------------------------------------
+// CardSprite class declaration
 
 CardSprite = new Sprite
 CardSprite.fileName = "UNDEFINED"
-CardSprite.backImg = loadCardBackImg
-CardSprite.showingFront = false
+CardSprite.frontImg = null
+CardSprite.backImg = loadImg(backCardFileName)
+
+CardSprite.showingFront = function()
+  return self.image == self.frontImg
+end function
 CardSprite.showBack = function()
   self.image = self.backImg
-  self.showingFront = false
 end function
 CardSprite.showFront = function()
   self.image = self.frontImg
-  self.showingFront = true
 end function
 CardSprite.isPairOf = function(otherCard)
   return self.fileName == otherCard.fileName
@@ -107,6 +108,11 @@ createCardSprite = function(fileName,cardImg)
   cardSprite.showBack
   return cardSprite
 end function
+
+// ------------------------------------------------
+// Cards building
+
+cards = []
 
 // Create card sprites from file-names
 for fileName in foodFileNames
@@ -139,40 +145,66 @@ for y in range(0,countRows-1)
   end for
 end for
 
-// Used to signalize the user that something special
-// happened with these cards. Usually that a pair was found.
-glowCards = function(cardsToGlow)
+// ------------------------------------------------
+// Attempted pair logic
+
+pair = {}
+pair.firstCard = null
+pair.secondCard = null
+pair.reset = function()
+  self.firstCard = null
+  self.secondCard = null
+end function
+pair.isMatched = function()
+  return self.firstCard.isPairOf(self.secondCard)
+end function
+pair.hasFirstCard = function()
+  return self.firstCard != null
+end function
+pair.hasSecondCard = function()
+  return self.secondCard != null
+end function
+pair.showBack = function()
+  self.firstCard.showBack
+  self.secondCard.showBack
+end function 
+pair.glowCards = function()
+  cardsToGlow = [self.firstCard, self.secondCard]
   for i in range(0,1)
     for transparency in range(255,80,-40)
       tintColor = rgba(255,255,255,transparency)
-      for card in cardsToGlow
-        card.tint = tintColor
-      end for
+      self.firstCard.tint = tintColor
+      self.secondCard.tint = tintColor
       wait 0.01
       yield
     end for
     for transparency in range(80,255,40)
       tintColor = rgba(255,255,255,transparency)
-      for card in cardsToGlow
-        card.tint = tintColor
-      end for
+      self.firstCard.tint = tintColor
+      self.secondCard.tint = tintColor
       wait 0.01
       yield
     end for
   end for
 end function
 
-// -- MAIN PROGRAM --
 
+// ------------------------------------------------
+// Game logic - properties
+
+// Used to handle single mouse clicks
 wasButtonDown = false
 isButtonDown = false
 
-cardA = null
-cardB = null
+// Used to track game progress
 pairedCardsCount = 0
 
+// Used for game statistics
 attempts = 0
 startTime = time
+
+// ------------------------------------------------
+// Game logic - helper functions
 
 exitIfRequested = function()
   // No `key.available` and `key.get` - only `key.pressed`
@@ -180,6 +212,9 @@ exitIfRequested = function()
     exit
   end if
 end function
+
+// ------------------------------------------------
+// Game logic - main loop
 
 while true
   isButtonDown = mouse.button  
@@ -197,26 +232,25 @@ while true
   // Prevent processing further mouse-clicks in next loop
   wasButtonDown = isButtonDown
 
+  // Process clicked card, if any
   if clickedCard != null then
     clickedCard.showFront
-    if cardA == null then
-      cardA = clickedCard
-    else if cardB == null then
-      cardB = clickedCard
-      if cardB.isPairOf(cardA) then
+
+    if not pair.hasFirstCard then
+      pair.firstCard = clickedCard
+    else if not pair.hasSecondCard then
+      pair.secondCard = clickedCard
+      if pair.isMatched then
         // Match found!
         pairedCardsCount = pairedCardsCount + 2
-        glowCards([cardA, cardB])
+        pair.glowCards
       else
         // No match - hide the pair after a while
         wait(SECONDS_TO_PEEK)
-        cardA.showBack
-        cardB.showBack
+        pair.showBack
         attempts = attempts + 1
       end if
-      // Reset attempted cards
-      cardA = null
-      cardB = null
+      pair.reset
     end if
   end if
     
