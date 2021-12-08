@@ -188,7 +188,6 @@ pair.glowCards = function()
   end for
 end function
 
-
 // ------------------------------------------------
 // Game logic - properties
 
@@ -202,16 +201,6 @@ pairedCardsCount = 0
 // Used for game statistics
 attempts = 0
 startTime = time
-
-// ------------------------------------------------
-// Game logic - helper functions
-
-exitIfRequested = function()
-  // No `key.available` and `key.get` - only `key.pressed`
-  if key.pressed("q") or key.pressed("escape") then
-    exit
-  end if
-end function
 
 // ------------------------------------------------
 // Game logic - main loop
@@ -235,7 +224,6 @@ while true
   // Process clicked card, if any
   if clickedCard != null then
     clickedCard.showFront
-
     if not pair.hasFirstCard then
       pair.firstCard = clickedCard
     else if not pair.hasSecondCard then
@@ -246,7 +234,7 @@ while true
         pair.glowCards
       else
         // No match - hide the pair after a while
-        wait(SECONDS_TO_PEEK)
+        wait SECONDS_TO_PEEK
         pair.showBack
         attempts = attempts + 1
       end if
@@ -254,19 +242,21 @@ while true
     end if
   end if
     
+  // Check if the game is won
   if pairedCardsCount == len(cards) then
-    // Game is won
     endTime = time
     timeTaken = round(endTime-startTime,0)
     print "Solved! (in "+attempts+" attempts and "+timeTaken+" seconds)"
     print("Press Q or ESC to exit ...")
+    // Wait for user to exit
     while true
-      exitIfRequested
+      if key.pressed("q") or key.pressed("escape") then exit
       yield
     end while
   end if
 
-  exitIfRequested
-    
+  // Give user chance to exit game
+  if key.pressed("q") or key.pressed("escape") then exit
+  
   yield
 end while
