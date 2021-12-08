@@ -6,17 +6,17 @@
 
 // Convert a 0-255 number to a 2-digit hex string
 hex2 = function(val)
-	result = 0
-	digits = "0123456789ABCDEF"
-	val = floor(val)
-	if val < 0 then return "00"
-	if val >= 255 then return "FF"
-	return digits[val / 16] + digits[val % 16]
+  result = 0
+  digits = "0123456789ABCDEF"
+  val = floor(val)
+  if val < 0 then return "00"
+  if val >= 255 then return "FF"
+  return digits[val / 16] + digits[val % 16]
 end function
 
 color = {}
 color.rgba = function(r, g, b, a)
-	return "#" + hex2(r) + hex2(g) + hex2(b) + hex2(a)
+  return "#" + hex2(r) + hex2(g) + hex2(b) + hex2(a)
 end function
 
 // ------------------------------------------------
@@ -64,8 +64,8 @@ boardOriginY=640/2-(boardHeight/2)
 
 
 loadCardBackImg = function()
-	img = file.loadImage(file.child("card_images","Back_Card.png"))
-	return img
+  img = file.loadImage(file.child("card_images","Back_Card.png"))
+  return img
 end function
 
 cards = []
@@ -77,38 +77,38 @@ CardSprite.otherPair = null
 CardSprite.backImg = loadCardBackImg
 CardSprite.showingFront = false
 CardSprite.showBack = function()
-	self.image = self.backImg
-	self.showingFront = false
+  self.image = self.backImg
+  self.showingFront = false
 end function
 CardSprite.showFront = function()
-	self.image = self.frontImg
-	self.showingFront = true
+  self.image = self.frontImg
+  self.showingFront = true
 end function
 
 createCardSprite = function(variant,fileName,cardImg)
-	cardSprite = new CardSprite
-	cardSprite.variant = variant
-	cardSprite.frontImg = cardImg
-	cardSprite.fileName = fileName
-	// Setting the localBounds is necessary to later being
-	// able to ask wether the sprite was clicked or not
-	cardSprite.localBounds = new Bounds
-	cardSprite.localBounds.width = cardImg.width
-	cardSprite.localBounds.height = cardImg.height
-	cardSprite.showBack
-	return cardSprite
+  cardSprite = new CardSprite
+  cardSprite.variant = variant
+  cardSprite.frontImg = cardImg
+  cardSprite.fileName = fileName
+  // Setting the localBounds is necessary to later being
+  // able to ask wether the sprite was clicked or not
+  cardSprite.localBounds = new Bounds
+  cardSprite.localBounds.width = cardImg.width
+  cardSprite.localBounds.height = cardImg.height
+  cardSprite.showBack
+  return cardSprite
 end function
 
 // Create card sprites from file-names
 for fileName in foodFileNames
-	cardImg = file.loadImage(file.child("card_images", fileName))
-	// We now have the image of the card, let's create sprites
-	cardSpriteA = createCardSprite("A",fileName,cardImg)
-	cardSpriteB = createCardSprite("B",fileName,cardImg)
-	cardSpriteA.otherPair = cardSpriteB
-	cardSpriteB.otherPair = cardSpriteA
-	cards.push cardSpriteA
-	cards.push cardSpriteB
+  cardImg = file.loadImage(file.child("card_images", fileName))
+  // We now have the image of the card, let's create sprites
+  cardSpriteA = createCardSprite("A",fileName,cardImg)
+  cardSpriteB = createCardSprite("B",fileName,cardImg)
+  cardSpriteA.otherPair = cardSpriteB
+  cardSpriteB.otherPair = cardSpriteA
+  cards.push cardSpriteA
+  cards.push cardSpriteB
 end for
 
 // Mix all the cards!
@@ -117,42 +117,42 @@ cards.shuffle
 // Place cards on the board / screen
 cardIdx = 0
 for y in range(0,countRows-1)
-	for x in range(0,countCols-1)
-		cardOriginX = boardOriginX+(x*(boxWidth+margin))
-		cardOriginY = boardOriginY+(y*(boxHeight+margin))
-		card = cards[cardIdx]
-		// Adjust sprite placement because coordinates
-		// refer to the center of it, not its leftBottom corner.
-		// Move it by half its size.
-		card.x = cardOriginX+boxWidth/2
-		card.y = cardOriginY+boxHeight/2
-		sprites.push card
-		// Take next card
-		cardIdx = cardIdx + 1
-	end for
+  for x in range(0,countCols-1)
+    cardOriginX = boardOriginX+(x*(boxWidth+margin))
+    cardOriginY = boardOriginY+(y*(boxHeight+margin))
+    card = cards[cardIdx]
+    // Adjust sprite placement because coordinates
+    // refer to the center of it, not its leftBottom corner.
+    // Move it by half its size.
+    card.x = cardOriginX+boxWidth/2
+    card.y = cardOriginY+boxHeight/2
+    sprites.push card
+    // Take next card
+    cardIdx = cardIdx + 1
+  end for
 end for
 
 // Used to signalize the user that something special
 // happened with these cards. Usually that a pair was found.
 glowCards = function(cardsToGlow)
-	for i in range(0,1)
-		for transparency in range(255,80,-40)
-			tintColor = color.rgba(255,255,255,transparency)
-			for card in cardsToGlow
-				card.tint = tintColor
-			end for
-			wait 0.01
-			yield
-		end for
-		for transparency in range(80,255,40)
-			tintColor = color.rgba(255,255,255,transparency)
-			for card in cardsToGlow
-				card.tint = tintColor
-			end for
-			wait 0.01
-			yield
-		end for
-	end for
+  for i in range(0,1)
+    for transparency in range(255,80,-40)
+      tintColor = color.rgba(255,255,255,transparency)
+      for card in cardsToGlow
+        card.tint = tintColor
+      end for
+      wait 0.01
+      yield
+    end for
+    for transparency in range(80,255,40)
+      tintColor = color.rgba(255,255,255,transparency)
+      for card in cardsToGlow
+        card.tint = tintColor
+      end for
+      wait 0.01
+      yield
+    end for
+  end for
 end function
 
 // -- MAIN PROGRAM --
@@ -174,57 +174,57 @@ exitIfRequested = function()
 end function
 
 while true
-	isButtonDown = mouse.button  
-	
-	if isButtonDown and not wasButtonDown then
-		if len(attemptedCards) >= 2 then
-			// Bypass user clicks if already showing 2 attempted cards
-			break
-		end if
-		for card in cards
-			if card.contains(mouse) and not card.showingFront then
-				attemptedCards.push card
-				card.showFront	
-			end if
-		end for
-	end if
-	
-	wasButtonDown = isButtonDown
-	
-	if len(attemptedCards) == 2 then
-		cardA = attemptedCards[0]
-		cardB = attemptedCards[1]
-		if cardA.otherPair == cardB then
-			// Match found!
-			matchedCards = [cardA, cardB]
-			pairedCards = pairedCards + matchedCards
-			attemptedCards = []
-			hideCardsTimeout = 0
-			glowCards(matchedCards)
-		else
-			// No match - hide the pair after a while
-			wait(SECONDS_TO_PEEK)
-			for s in attemptedCards
-				s.showBack
-			end for
-			attemptedCards = []
-			attempts = attempts + 1
-		end if
-	end if	
-	
-	if len(pairedCards) == len(cards) then
-		// Game is won
-		endTime = time
-		timeTaken = round(endTime-startTime,0)
-		print "Solved! (in "+attempts+" attempts and "+timeTaken+" seconds)"
-		print("Press Q or ESC to exit ...")
+  isButtonDown = mouse.button  
+  
+  if isButtonDown and not wasButtonDown then
+    if len(attemptedCards) >= 2 then
+      // Bypass user clicks if already showing 2 attempted cards
+      break
+    end if
+    for card in cards
+      if card.contains(mouse) and not card.showingFront then
+        attemptedCards.push card
+        card.showFront	
+      end if
+    end for
+  end if
+  
+  wasButtonDown = isButtonDown
+  
+  if len(attemptedCards) == 2 then
+    cardA = attemptedCards[0]
+    cardB = attemptedCards[1]
+    if cardA.otherPair == cardB then
+      // Match found!
+      matchedCards = [cardA, cardB]
+      pairedCards = pairedCards + matchedCards
+      attemptedCards = []
+      hideCardsTimeout = 0
+      glowCards(matchedCards)
+    else
+      // No match - hide the pair after a while
+      wait(SECONDS_TO_PEEK)
+      for s in attemptedCards
+        s.showBack
+      end for
+      attemptedCards = []
+      attempts = attempts + 1
+    end if
+  end if	
+  
+  if len(pairedCards) == len(cards) then
+    // Game is won
+    endTime = time
+    timeTaken = round(endTime-startTime,0)
+    print "Solved! (in "+attempts+" attempts and "+timeTaken+" seconds)"
+    print("Press Q or ESC to exit ...")
     while true
       exitIfRequested
       yield
     end while
-	end if
+  end if
 
   exitIfRequested
-		
-	yield
+    
+  yield
 end while
